@@ -9,3 +9,4 @@ include_once( "BattleShip.php");
 header( 'Content-Type:text/html; charset=UTF-8' );
 
 $bs = new BattleShip();
+$bs->startGame();

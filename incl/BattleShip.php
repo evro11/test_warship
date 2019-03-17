@@ -26,10 +26,14 @@ class BattleShip
             $this->ships = $_SESSION['ships'];
         }
         
-        
         $this->test = false;
         
-        if (!empty($_POST["data"])) {
+        //var_dump($this->battleField);
+    } 
+    
+    
+    public function startGame() {
+	if (!empty($_POST["data"])) {
             $this->parseData();
             
         }
@@ -44,9 +48,8 @@ class BattleShip
         
             $this->outputPage();
         }
+    }
     
-        //var_dump($this->battleField);
-    } 
     
     public function readTemplate($fileName) {
         $myfile = fopen("tpl" . DS . $fileName, "r") or die("Unable to open file!");
