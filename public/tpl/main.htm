@@ -5,14 +5,19 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-<link rel="stylesheet" href="style.css" type="text/css"/>
+<link rel="stylesheet" href="css/style.css" type="text/css"/>
 
-<script src="jquery-3.3.1.min.js"> </script>
-<script src="script.js"></script>
+<script src="js/jquery-3.3.1.min.js"> </script>
+<script src="js/script.js"></script>
 
 </head>
 <body>
-  %battleTable%
+  <table>
+    <tr>
+      <td id="gamepad">%battleTable%</td>
+      <td height="400px"><div style="overflow:scroll; height:100%" id="log"></div></td>
+    </tr>
+  </table>
 
 </body>
 </html>

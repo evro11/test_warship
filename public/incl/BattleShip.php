@@ -13,8 +13,7 @@ class BattleShip
     private $ships;
     
     private $test;
-    
-    
+
     public function __construct()
     {
         if ( !isset($_SESSION) )  { 
@@ -26,41 +25,44 @@ class BattleShip
             $this->ships = $_SESSION['ships'];
         }
         
-        $this->test = false;
-        
-        //var_dump($this->battleField);
-    } 
-    
-    
+        $this->test = $_ENV["TEST"];
+    }
+
+
+    /**
+     * @throws Exception
+     */
     public function startGame() {
-	if (!empty($_POST["data"])) {
+	    if (!empty($_POST["data"])) {
             $this->parseData();
             
-        }
-        else {
+        } else {
             $this->battleField = array();
             $this->ships = array();
             $this->initBattleField();
             $this->initShips();
-            
+
             $_SESSION['battleField'] = $this->battleField;
             $_SESSION['ships'] = $this->ships;
         
             $this->outputPage();
         }
     }
-    
-    
-    public function readTemplate($fileName) {
-        $myfile = fopen("tpl" . DS . $fileName, "r") or die("Unable to open file!");
-        $html =  fread($myfile,filesize("tpl" . DS . $fileName));
+
+    /**
+     * @param $fileName
+     * @return string
+     */
+    private function readTemplate($fileName) {
+        $myFile = fopen("tpl" . DS . $fileName, "r") or die("Unable to open file!");
+        $html =  fread($myFile,filesize("tpl" . DS . $fileName));
         
-        fclose($myfile);
+        fclose($myFile);
         
         return $html;
     }
     
-    public function outputPage() {
+    private function outputPage() {
         $html =  $this->readTemplate("main.htm");
         
         $table = '<div id="container">' . PHP_EOL;
@@ -102,7 +104,10 @@ class BattleShip
             $this->battleField[$row] = $fieldRow;
         }
     }
-    
+
+    /**
+     * @throws Exception
+     */
     private function initShips() {
         $allShipsI = $this-> initShipsI();
         $allShipsL = $this->initShipsL();
@@ -115,7 +120,7 @@ class BattleShip
         shuffle($shipNames);
         
         // shipI
-        $pos = random_int(0, count($allShipsI)); 
+        $pos = random_int(0, count($allShipsI)-1);
         $this->ships[] = array( 'ship' => $allShipsI[$pos], 'name' => $shipNames[0]);
         $this->addToBattleField($allShipsI[$pos], $shipNames[0]);
         
@@ -139,19 +144,14 @@ class BattleShip
             $this->ships[] = array( 'ship' => $allShipsDot[$pos], 'name' => $shipNames[3]);
             $this->addToBattleField($allShipsDot[$pos], $shipNames[3]);
         }
-        
-        
-        //var_dump($allShipsDot);
-        //var_dump($allShipsL);
-        
-        //var_dump($this->ships);
-        //var_dump($this->battleField);
     }
-    
-    
+
     /**
-    * find ship that we can add
-    */ 
+     * find ship that we can add
+     * @param $shipsArr
+     * @return bool
+     * @throws Exception
+     */
     private function findNewShip($shipsArr) {
         for ($i = 0; $i < 100; $i++) {
             $pos = random_int(0, count($shipsArr)-1); 
@@ -165,7 +165,6 @@ class BattleShip
            // control if place is free:
             for ($place = 0; $place < count($shipsArr[$pos]); $place++) {
                 $shipPart = $this->getCoordinates($shipsArr[$pos][$place]);
-               // print_r($shipPart);
                 if (!$this->battleField[$shipPart[0]][$shipPart[1]]['free']) {
                     $canAdd = false;
                     break;
@@ -178,8 +177,7 @@ class BattleShip
         }
         return false;
     }
-    
-    
+
     private function initShipsI() {
         $allShipsI = array();
         
@@ -207,8 +205,7 @@ class BattleShip
         
         return $allShipsI;
     }
-    
-    
+
     private function initShipsL() {
         $allShipsL = array();
         
@@ -266,14 +263,12 @@ class BattleShip
         
         return $allShipsL;
     }
-    
-    
+
     private function initShipsDot() {
         $allShipsDot = array();
         
         // Dot shape:
         for ($row=0; $row<10; $row++) {
-            $fieldRow = array();
             for ($column=0; $column<10; $column++) {
                 $id = 'r'.$row.'_c'.$column;
                 $allShipsDot[]  = array($id);
@@ -282,13 +277,15 @@ class BattleShip
         
         return $allShipsDot;
     }
-    
-    
+
+    /**
+     * @param $ship
+     * @param $name
+     */
     private function addToBattleField($ship, $name) {
 
         for ($i = 0; $i < count($ship); $i++) {
             $pos = $this->getCoordinates($ship[$i]);
-           // print_r($pos);
             $fPlace = &$this->battleField[$pos[0]][$pos[1]];
             for ($row = $pos[0]-1; $row <= $pos[0]+1; $row++) {
                 for ($col = $pos[1]-1; $col <= $pos[1]+1; $col++) {
@@ -299,20 +296,15 @@ class BattleShip
             }
 
             $fPlace['shipName'] = $name;
-            //$fPlace['shipPartNr'] = $i;
         }
-        //var_dump($ship);
-        //var_dump($this->battleField);
     }
-    
-    
+
     private function getCoordinates($place) {
         $pos = explode("_c",$place);
         $pos[0] = substr($pos[0], 1, 1);
         return $pos;
     }
-    
-    
+
     private function updateShip($name, $shipPartName) {
         $resp = 'hit';
         
@@ -336,8 +328,7 @@ class BattleShip
         
         return $resp;
     }
-    
-    
+
     private function parseData() {
         
         $obj = json_decode($_POST["data"]);
@@ -360,7 +351,7 @@ class BattleShip
                         $respObj['shipName'] = $fPlace['shipName'];
                         
                         $respObj['gameOver'] = false;
-                        if ($this->isGameOveer()) {
+                        if ($this->isGameOver()) {
                             $respObj['gameOver'] = true;
                             $respObj['message'] = "Game is over. Refresh the page to start new game";
                         }
@@ -383,17 +374,15 @@ class BattleShip
         
         echo json_encode($respObj);
     }
-    
-    
-    private function isGameOveer() {
+
+    private function isGameOver() {
         $resp = true;
         for ($i = 0; $i < count($this->ships); $i++) {
             if (0 < count($this->ships[$i]['ship'])) {
                 $resp = false;
             }
         }
-        return $resp;;
+        return $resp;
     }
-    
-    
+
 }

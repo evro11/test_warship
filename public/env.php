@@ -26,7 +26,6 @@ ini_set( 'include_path', $d . $PATH . $d . ini_get('include_path') );
 // Report all errors except E_STRICT
 error_reporting(E_ALL & ~E_STRICT);
 
-
-
+$_ENV["TEST"]=false;
 
 ?>
