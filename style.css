@@ -1,0 +1,32 @@
+#container {
+    display: table;
+}
+
+.row  {
+    display: table-row;
+}
+
+.t_column {
+    display: table-cell;
+	padding: 2px;
+	height: 40px;
+	width: 40px;
+	border-style: solid;
+    border-width: 2px;
+}
+
+.t_empty{
+	cursor: pointer;
+}
+.t_shot {
+	cursor: auto;
+}
+.t_miss {
+	background: blue;
+}
+.t_ship_hit {
+	background: yellow;
+}
+.t_ship_sunk {
+	background: red;
+}
